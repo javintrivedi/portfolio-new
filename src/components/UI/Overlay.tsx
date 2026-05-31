@@ -103,7 +103,7 @@ export default function Overlay({ activeSection, setActiveSection, visitedCount,
           
           <div style={{ position: 'relative' }}>
             <NavButton 
-              id="contact" 
+              id={"contact" as any} 
               label="CONTACT" 
               activeSection={contactOpen ? 'contact' as any : activeSection} 
               onClick={() => setContactOpen(!contactOpen)} 
