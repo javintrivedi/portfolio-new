@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useEffect, useState } from 'react';
+import { useRef, useEffect, useState, startTransition } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import Lenis from 'lenis';
 import './FlowingMenu.css';
@@ -92,7 +92,7 @@ export default function FlowingMenu({
             <div 
               key={idx} 
               className="project-item"
-              onMouseEnter={() => setActiveIndex(originalIndex)}
+              onMouseEnter={() => startTransition(() => setActiveIndex(originalIndex))}
               style={{
                 opacity: isActive ? 1 : 0.3,
                 transform: isActive ? 'scale(1)' : 'scale(0.95)',

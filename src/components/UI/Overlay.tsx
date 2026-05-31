@@ -320,8 +320,8 @@ function NavButton({ id, label, activeSection, onClick }: { id: SectionId, label
 
   return (
     <button
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
+      onMouseEnter={() => startTransition(() => setHovered(true))}
+      onMouseLeave={() => startTransition(() => setHovered(false))}
       onClick={onClick}
       style={{
         background: 'none',
