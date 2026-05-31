@@ -32,15 +32,17 @@ export default function Overlay({ activeSection, setActiveSection, visitedCount,
   const [contactOpen, setContactOpen] = useState(false);
   const activeData = activeSection ? portfolioData[activeSection] : null;
   const handleNavClick = (id: SectionId) => {
-    // Close contact dropdown if open
-    setContactOpen(false);
-    
-    // Only set active section if it's different to allow toggling off
-    if (activeSection === id) {
-      setActiveSection(null);
-    } else {
-      setActiveSection(id);
-    }
+    startTransition(() => {
+      // Close contact dropdown if open
+      setContactOpen(false);
+      
+      // Only set active section if it's different to allow toggling off
+      if (activeSection === id) {
+        setActiveSection(null);
+      } else {
+        setActiveSection(id);
+      }
+    });
   };
 
   return (
