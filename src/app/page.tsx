@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, startTransition } from 'react';
 import Scene from '@/components/Canvas/Scene';
 import Overlay from '@/components/UI/Overlay';
 import Loader from '@/components/UI/Loader';
@@ -14,10 +14,12 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
 
   const setActiveSection = (id: SectionId) => {
-    setActiveSectionState(id);
-    if (id) {
-      setVisitedSections((prev) => new Set(prev).add(id));
-    }
+    startTransition(() => {
+      setActiveSectionState(id);
+      if (id) {
+        setVisitedSections((prev) => new Set(prev).add(id));
+      }
+    });
   };
   const onGuideClick = () => {
     // List of all sections

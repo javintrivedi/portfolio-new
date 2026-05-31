@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion';
 import { portfolioData, SectionId } from '@/data/portfolio';
-import { useState } from 'react';
+import { useState, startTransition } from 'react';
 import ScrambleText from './ScrambleText';
 import FlowingMenu from './FlowingMenu';
 import AboutSection from './AboutSection';
@@ -106,7 +106,7 @@ export default function Overlay({ activeSection, setActiveSection, visitedCount,
               id={"contact" as any} 
               label="CONTACT" 
               activeSection={contactOpen ? 'contact' as any : activeSection} 
-              onClick={() => setContactOpen(!contactOpen)} 
+              onClick={() => startTransition(() => setContactOpen(!contactOpen))} 
             />
             
             <AnimatePresence>
