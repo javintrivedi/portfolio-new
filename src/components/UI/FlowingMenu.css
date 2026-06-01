@@ -82,3 +82,18 @@
  * Active vs Inactive state classes are handled via inline styles in React 
  * to allow dynamic color props, but we can set defaults here if needed.
  */
+
+/* ─── Tablet ─────────────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .project-title  { font-size: 10vh; }
+  .project-index  { font-size: 1.1rem; margin-right: 1.5rem; }
+  .scroll-track   { padding-left: 2.5rem; }
+}
+
+/* ─── Mobile ─────────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .project-title  { font-size: 9vw; white-space: normal; line-height: 1; }
+  .project-index  { font-size: 0.75rem; margin-right: 0.8rem; }
+  .scroll-track   { padding-left: 1.2rem; }
+  .project-item   { height: auto; min-height: 10vh; white-space: normal; flex-wrap: wrap; align-items: center; }
+}

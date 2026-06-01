@@ -14,7 +14,6 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* Prevent mobile tap-highlight flicker */
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -23,21 +22,133 @@ a {
   text-decoration: none;
 }
 
-/* Force GPU compositing on the canvas layer — prevents main thread paints */
 canvas {
   display: block;
-  /* Isolate the WebGL canvas in its own compositor layer */
   will-change: transform;
   contain: strict;
 }
 
-/* Overlay UI — isolate from canvas compositor layer */
 #main-nav {
-  /* contain: layout prevents the nav from triggering full-page layout recalcs */
   contain: layout style;
 }
 
-/* Prevent scroll chaining from within Lenis-scrolled containers */
-[data-lenis-prevent] {
-  overscroll-behavior: contain;
+/* ─── Responsive Nav ─────────────────────────────────────────────── */
+.nav-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: color 0.3s ease;
+  text-shadow: none;
+  font-family: var(--font-space-mono);
+  padding: 0;
+}
+.nav-btn:hover,
+.nav-btn[data-active="true"] { color: #ffffff; }
+.nav-btn[data-active="true"] { text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+.nav-logo {
+  background: none; border: none; color: #ffffff; cursor: pointer;
+  font-size: 1.5rem; letter-spacing: 0.2em; text-transform: uppercase;
+  font-family: var(--font-space-mono);
+  text-shadow: 0 0 10px rgba(255,255,255,0.2);
+  transition: text-shadow 0.3s ease; padding: 0;
+}
+.nav-logo:hover { text-shadow: 0 0 20px rgba(255,255,255,0.8); }
+
+.social-link { color: #aaaaaa; transition: color 0.3s ease; display: flex; }
+.social-link:hover { color: #ffffff; }
+
+.resume-link { color: #aaaaaa; transition: color 0.3s ease; }
+.resume-link:hover { color: #ffffff; }
+
+.hover-link {
+  color: rgba(255,255,255,0.4); font-size: 0.85rem; letter-spacing: 0.1em;
+  text-transform: uppercase; text-decoration: none;
+  transition: color 0.3s ease, text-shadow 0.3s ease;
+  text-shadow: none; white-space: nowrap; font-family: var(--font-space-mono);
+}
+.hover-link:hover { color: #ffffff; text-shadow: 0 0 10px rgba(255,255,255,0.5); }
+
+/* ─── Side Widgets (hide on mobile) ─────────────────────────────── */
+.side-widget { display: block; }
+
+/* ─── About Section ─────────────────────────────────────────────── */
+.about-padding   { padding: 4rem; }
+.about-hero-name { font-size: clamp(4rem, 15vw, 15rem); }
+.about-statement { font-size: 15vw; }
+.about-exp-name  { font-size: clamp(2.5rem, 8vw, 5rem); }
+.about-ach-title { font-size: clamp(1.5rem, 4vw, 3.5rem); }
+.about-marquee   { font-size: 20vw; }
+
+/* ─── Skills Section ─────────────────────────────────────────────── */
+.skills-layout    { flex-direction: row; }
+.skills-left      { position: sticky; top: 0; height: 100vh; width: 50%; padding: 8rem 4rem 4rem 4rem; }
+.skills-right     { width: 50%; padding: 12rem 4rem 12rem 2rem; }
+.skills-title     { font-size: clamp(2.5rem, 5vw, 4.5rem); }
+
+/* ─── Flowing Menu ───────────────────────────────────────────────── */
+.project-title  { font-size: 15vh; }
+.project-index  { font-size: 1.5rem; }
+.scroll-track   { padding-left: 4rem; }
+
+/* ─── Floating Notes ─────────────────────────────────────────────── */
+.note-wrap     { gap: 6rem; }
+.note-svg-lg   { width: 250px; height: 250px; }
+.note-svg-md   { width: 200px; height: 200px; }
+.note-svg-sm   { width: 220px; height: 220px; }
+
+/* ─── Mobile (≤ 768px) ───────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .side-widget          { display: none !important; }
+
+  /* Nav */
+  .nav-btn              { font-size: 0.65rem; letter-spacing: 0.05em; }
+  .nav-logo             { font-size: 1.1rem; }
+  .hover-link           { font-size: 0.7rem; }
+
+  /* About */
+  .about-padding        { padding: 1.5rem; }
+  .about-hero-name      { font-size: clamp(3.5rem, 18vw, 7rem); }
+  .about-statement      { font-size: 12vw; }
+  .about-exp-name       { font-size: clamp(2rem, 10vw, 4rem); }
+  .about-ach-title      { font-size: clamp(1.2rem, 5vw, 2rem); }
+  .about-marquee        { font-size: 18vw; }
+
+  /* Skills */
+  .skills-layout        { flex-direction: column; }
+  .skills-left          { position: relative; height: auto; width: 100%; padding: 6rem 1.5rem 2rem 1.5rem; }
+  .skills-right         { width: 100%; padding: 2rem 1.5rem 6rem 1.5rem; }
+  .skills-title         { font-size: clamp(1.8rem, 7vw, 3rem); }
+
+  /* Projects menu */
+  .project-title        { font-size: 10vw; }
+  .project-index        { font-size: 0.85rem; margin-right: 1rem; }
+  .scroll-track         { padding-left: 1.5rem; }
+
+  /* Floating notes */
+  .note-wrap            { gap: 2rem; }
+  .note-svg-lg          { width: 100px; height: 100px; }
+  .note-svg-md          { width: 80px;  height: 80px;  }
+  .note-svg-sm          { width: 90px;  height: 90px;  }
+}
+
+/* ─── Tablet (769px – 1024px) ────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .about-padding        { padding: 2.5rem; }
+  .about-exp-name       { font-size: clamp(2.5rem, 7vw, 4rem); }
+  .about-ach-title      { font-size: clamp(1.5rem, 3.5vw, 2.8rem); }
+
+  .skills-left          { padding: 6rem 2rem 4rem 2rem; }
+  .skills-right         { padding: 8rem 2rem 8rem 2rem; }
+
+  .note-svg-lg          { width: 160px; height: 160px; }
+  .note-svg-md          { width: 130px; height: 130px; }
+  .note-svg-sm          { width: 145px; height: 145px; }
+  .note-wrap            { gap: 3rem; }
+
+  .project-title        { font-size: 10vh; }
 }

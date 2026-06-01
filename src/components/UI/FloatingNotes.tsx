@@ -189,7 +189,7 @@ export default function FloatingNotes() {
   }, [spawnBurst]);
 
   return (
-    <div style={{ position: 'relative', display: 'flex', gap: '6rem', alignItems: 'center', justifyContent: 'center' }}>
+    <div className="note-wrap" style={{ position: 'relative', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <style>{`
         @keyframes noteFloat {
           0%, 100% { transform: translateY(0px); }
@@ -205,32 +205,25 @@ export default function FloatingNotes() {
         .floating-note:active { filter: brightness(2); transform: scale(0.93); }
       `}</style>
 
-      <canvas
-        ref={canvasRef}
-        style={{
-          position: 'fixed', top: 0, left: 0,
-          width: '100vw', height: '100vh',
-          pointerEvents: 'none', zIndex: 200,
-        }}
-      />
+      <canvas ref={canvasRef} style={{ position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', pointerEvents: 'none', zIndex: 200 }} />
 
-      {/* Note 1 — Am chord — blue */}
+      {/* Note 1 — Am — blue */}
       <div className="floating-note" style={{ animation: 'noteFloat 4s ease-in-out infinite' }} onClick={(e) => handleClick(e, '#00aaff')}>
-        <svg viewBox="0 0 12 12" style={{ width: '250px', height: '250px', shapeRendering: 'crispEdges', filter: 'drop-shadow(-20px 20px 0 rgba(0,170,255,0.2))' }}>
+        <svg viewBox="0 0 12 12" className="note-svg-lg" style={{ shapeRendering: 'crispEdges', filter: 'drop-shadow(-20px 20px 0 rgba(0,170,255,0.2))' }}>
           <path d="M3 8 h3 v2 h-3 z M8 7 h3 v3 h-3 z M5 2 h1 v7 h-1 z M10 1 h1 v7 h-1 z M5 1 h6 v2 h-6 z" fill="#00aaff" />
         </svg>
       </div>
 
-      {/* Note 2 — Em chord — purple */}
+      {/* Note 2 — Em — purple */}
       <div className="floating-note" style={{ animation: 'noteFloat 4.5s ease-in-out 0.5s infinite' }} onClick={(e) => handleClick(e, '#aa00ff')}>
-        <svg viewBox="0 0 12 12" style={{ width: '200px', height: '200px', shapeRendering: 'crispEdges', filter: 'drop-shadow(-20px 20px 0 rgba(170,0,255,0.2))' }}>
+        <svg viewBox="0 0 12 12" className="note-svg-md" style={{ shapeRendering: 'crispEdges', filter: 'drop-shadow(-20px 20px 0 rgba(170,0,255,0.2))' }}>
           <path d="M4 8 h3 v3 h-3 z M6 2 h1 v8 h-1 z M7 2 h3 v2 h-3 z" fill="#aa00ff" />
         </svg>
       </div>
 
-      {/* Note 3 — D chord — pink */}
+      {/* Note 3 — D — pink */}
       <div className="floating-note" style={{ animation: 'noteFloat 5s ease-in-out 1s infinite' }} onClick={(e) => handleClick(e, '#ff00aa')}>
-        <svg viewBox="0 0 12 12" style={{ width: '220px', height: '220px', shapeRendering: 'crispEdges', filter: 'drop-shadow(-20px 20px 0 rgba(255,0,170,0.2))' }}>
+        <svg viewBox="0 0 12 12" className="note-svg-sm" style={{ shapeRendering: 'crispEdges', filter: 'drop-shadow(-20px 20px 0 rgba(255,0,170,0.2))' }}>
           <path d="M4 8 h3 v3 h-3 z M6 2 h1 v8 h-1 z M7 2 h4 v2 h-4 z M10 4 h1 v2 h-1 z M9 5 h1 v2 h-1 z" fill="#ff00aa" />
         </svg>
       </div>
