@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!<>-_\\/[]{}—=+*^?#_';
 
@@ -16,58 +16,71 @@ const SENTENCES = [
 ];
 
 export default function LoopingScrambleText() {
-  const [displayText, setDisplayText] = useState(SENTENCES[0]);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const spanRef = useRef<HTMLDivElement>(null);
+  const sentenceIndexRef = useRef(0);
+  const scrambleIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const cycleTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
-    const cycleInterval = setInterval(() => {
-      const nextIndex = (currentIndex + 1) % SENTENCES.length;
-      setCurrentIndex(nextIndex);
-      
+    if (spanRef.current) spanRef.current.textContent = SENTENCES[0];
+
+    const runScramble = (nextIndex: number) => {
       const nextSentence = SENTENCES[nextIndex];
       let iteration = 0;
-      const length = Math.max(displayText.length, nextSentence.length);
-      
-      const scrambleInterval = setInterval(() => {
-        setDisplayText((prev) => {
-          return nextSentence
-            .split('')
-            .map((letter, index) => {
-              if (index < iteration) {
-                return nextSentence[index];
-              }
-              // While scrambling, if the current index is beyond the target string length, we just don't show it or show random chars that will be truncated
-              return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
-            })
-            .join('');
-        });
-        
-        if (iteration >= length) {
-          clearInterval(scrambleInterval);
-          setDisplayText(nextSentence);
-        }
-        
-        iteration += 1 / 2; // Decryption speed
-      }, 30);
-      
-    }, 5000); // 5 seconds
+      const length = nextSentence.length;
 
-    return () => clearInterval(cycleInterval);
-  }, [currentIndex, displayText]);
+      if (scrambleIntervalRef.current) clearInterval(scrambleIntervalRef.current);
+
+      scrambleIntervalRef.current = setInterval(() => {
+        if (!spanRef.current) return;
+        spanRef.current.textContent = nextSentence
+          .split('')
+          .map((_, index) => {
+            if (index < iteration) return nextSentence[index];
+            return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+          })
+          .join('');
+
+        iteration += 0.5;
+
+        if (iteration >= length) {
+          if (spanRef.current) spanRef.current.textContent = nextSentence;
+          clearInterval(scrambleIntervalRef.current!);
+          scrambleIntervalRef.current = null;
+        }
+      }, 30);
+    };
+
+    const schedule = () => {
+      cycleTimeoutRef.current = setTimeout(() => {
+        sentenceIndexRef.current = (sentenceIndexRef.current + 1) % SENTENCES.length;
+        runScramble(sentenceIndexRef.current);
+        schedule();
+      }, 5000);
+    };
+
+    schedule();
+
+    return () => {
+      if (scrambleIntervalRef.current) clearInterval(scrambleIntervalRef.current);
+      if (cycleTimeoutRef.current) clearTimeout(cycleTimeoutRef.current);
+    };
+  }, []); // Empty deps — runs once, uses refs for state
 
   return (
-    <div style={{
-      fontFamily: 'var(--font-space-mono)',
-      color: '#aaaaaa',
-      fontSize: '0.7rem',
-      letterSpacing: '0.15em',
-      lineHeight: '1.6',
-      pointerEvents: 'none',
-      textAlign: 'right',
-      maxWidth: '200px',
-      whiteSpace: 'pre-wrap' // Allows wrapping for longer sentences like the reference
-    }}>
-      {displayText}
-    </div>
+    <div
+      ref={spanRef}
+      style={{
+        fontFamily: 'var(--font-space-mono)',
+        color: '#aaaaaa',
+        fontSize: '0.7rem',
+        letterSpacing: '0.15em',
+        lineHeight: '1.6',
+        pointerEvents: 'none',
+        textAlign: 'right',
+        maxWidth: '200px',
+        whiteSpace: 'pre-wrap'
+      }}
+    />
   );
 }

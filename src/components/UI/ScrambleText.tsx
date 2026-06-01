@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface ScrambleTextProps {
   text: string;
@@ -10,43 +10,48 @@ interface ScrambleTextProps {
 const CHARACTERS = '!<>-_\\/[]{}—=+*^?#_';
 
 export default function ScrambleText({ text, isHovered }: ScrambleTextProps) {
-  const [displayText, setDisplayText] = useState(text);
-  const frameRef = useRef<number | null>(null);
-  const queueRef = useRef<{ from: string; to: string; start: number; end: number; char?: string }[]>([]);
-  const frameCounterRef = useRef(0);
+  const spanRef = useRef<HTMLSpanElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const iterationRef = useRef(0);
 
   useEffect(() => {
-    if (isHovered) {
-      // Scramble on hover
-      let iteration = 0;
-      const length = text.length;
-      
-      const interval = setInterval(() => {
-        setDisplayText((prev) => {
-          return prev
-            .split('')
-            .map((letter, index) => {
-              if (index < iteration) {
-                return text[index];
-              }
-              return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
-            })
-            .join('');
-        });
-        
-        if (iteration >= length) {
-          clearInterval(interval);
-        }
-        
-        iteration += 1 / 3; // Controls speed of decryption
-      }, 30);
-      
-      return () => clearInterval(interval);
-    } else {
-      // Return to original instantly when mouse leaves
-      setDisplayText(text);
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
     }
+
+    if (isHovered) {
+      iterationRef.current = 0;
+      intervalRef.current = setInterval(() => {
+        if (!spanRef.current) return;
+        const iteration = iterationRef.current;
+        spanRef.current.textContent = text
+          .split('')
+          .map((_, index) => {
+            if (index < iteration) return text[index];
+            return CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];
+          })
+          .join('');
+
+        iterationRef.current += 1 / 3;
+
+        if (iterationRef.current >= text.length) {
+          if (spanRef.current) spanRef.current.textContent = text;
+          clearInterval(intervalRef.current!);
+          intervalRef.current = null;
+        }
+      }, 30);
+    } else {
+      if (spanRef.current) spanRef.current.textContent = text;
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
   }, [isHovered, text]);
 
-  return <>{displayText}</>;
+  return <span ref={spanRef}>{text}</span>;
 }

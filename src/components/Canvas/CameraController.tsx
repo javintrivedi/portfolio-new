@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { useFrame } from '@react-three/fiber';
 import { SectionId, portfolioData } from '@/data/portfolio';
 import * as THREE from 'three';
@@ -8,36 +9,29 @@ interface CameraControllerProps {
   activeSection: SectionId;
 }
 
+// Pre-allocate vectors OUTSIDE the component — created once, reused every frame
+// Creating new THREE.Vector3() inside useFrame causes 120+ GC allocations/sec
+const _targetPos = new THREE.Vector3();
+const _defaultPos = new THREE.Vector3(0, 0, 10);
+const _defaultLook = new THREE.Vector3(0, 0, 0);
+const _nodeOffset = new THREE.Vector3(0, 0.5, 3);
+
 export default function CameraController({ activeSection }: CameraControllerProps) {
+  const activeSectionRef = useRef(activeSection);
+  activeSectionRef.current = activeSection;
+
   useFrame((state) => {
     const camera = state.camera;
-    
-    // Default camera position (zoomed out, observing the core)
-    let targetPosition = new THREE.Vector3(0, 0, 10);
-    let targetLookAt = new THREE.Vector3(0, 0, 0);
+    const section = activeSectionRef.current;
 
-    if (activeSection) {
-      // If a node is active, fly to it
-      const nodePos = new THREE.Vector3(...portfolioData[activeSection].position);
-      
-      // Position the camera slightly in front and above the node
-      targetPosition = nodePos.clone().add(new THREE.Vector3(0, 0.5, 3));
-      targetLookAt = nodePos;
+    if (section) {
+      const nodePos = portfolioData[section].position;
+      _targetPos.set(nodePos[0] + _nodeOffset.x, nodePos[1] + _nodeOffset.y, nodePos[2] + _nodeOffset.z);
+    } else {
+      _targetPos.copy(_defaultPos);
     }
 
-    // Smoothly interpolate the camera's position
-    camera.position.lerp(targetPosition, 0.05);
-
-    // To lerp the lookAt, we need to lerp the camera's rotation.
-    // Three.js doesn't have a direct lerpLookAt, so we use a dummy object or quaternions.
-    // An easy approximation for this use case is to adjust the lookAt target.
-    
-    // We can't easily lerp `camera.lookAt` directly because it sets rotation instantly.
-    // Instead, we maintain a target lookAt vector and lerp it, then tell the camera to look at it.
-    // Wait, state doesn't persist the current lookAt easily without refs.
-    // For simplicity, if we rely on OrbitControls for default looking, we shouldn't mix them.
-    // Since we disabled OrbitControls' panning, we can just let OrbitControls handle the target 
-    // in Scene.tsx, or we can disable OrbitControls when active.
+    camera.position.lerp(_targetPos, 0.05);
   });
 
   return null;

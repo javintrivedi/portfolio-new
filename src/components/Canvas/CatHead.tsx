@@ -8,39 +8,39 @@ interface CatHeadProps {
   visitedCount: number;
 }
 
+// Pre-allocate scale vector — reused every frame
+const _scale = new THREE.Vector3();
+
 export default function CatHead({ visitedCount }: CatHeadProps) {
   const pointsRef = useRef<THREE.Points>(null);
+  const visitedRef = useRef(visitedCount);
+  visitedRef.current = visitedCount;
 
-  // Generate a high density sphere to represent the halftone dots
-  const [positions] = useMemo(() => {
-    // Icosahedron with high detail creates a very even point distribution on a sphere
-    const geo = new THREE.IcosahedronGeometry(4, 24); // 24 detail = lots of points!
-    
-    // We only need the vertices for a point cloud
-    const pos = geo.attributes.position.array;
-    
-    return [pos];
+  // Reduced detail: 16 instead of 24 — still dense-looking sphere but ~50% fewer vertices
+  const positions = useMemo(() => {
+    const geo = new THREE.IcosahedronGeometry(4, 16);
+    const pos = geo.attributes.position.array as Float32Array;
+    geo.dispose(); // Free the geometry — we only need the position array
+    return pos;
   }, []);
 
   useFrame((state) => {
-    if (pointsRef.current) {
-      // Base continuous rotation
-      const baseRotY = state.clock.elapsedTime * 0.05;
-      const baseRotX = Math.sin(state.clock.elapsedTime * 0.2) * 0.05;
-      
-      // Target rotation based on mouse pointer (gyroscopic effect)
-      // Multiply by a factor to control the intensity of the parallax
-      const targetRotX = baseRotX - state.pointer.y * 0.5;
-      const targetRotY = baseRotY + state.pointer.x * 0.5;
+    if (!pointsRef.current) return;
 
-      // Smoothly interpolate current rotation towards target
-      pointsRef.current.rotation.x += (targetRotX - pointsRef.current.rotation.x) * 0.1;
-      pointsRef.current.rotation.y += (targetRotY - pointsRef.current.rotation.y) * 0.1;
-      
-      // Subtle breathing effect based on visited count
-      const pulse = 1 + Math.sin(state.clock.elapsedTime * 2) * 0.02 * (1 + visitedCount * 0.5);
-      pointsRef.current.scale.setScalar(pulse);
-    }
+    const t = state.clock.elapsedTime;
+    const baseRotY = t * 0.05;
+    const baseRotX = Math.sin(t * 0.2) * 0.05;
+
+    const targetRotX = baseRotX - state.pointer.y * 0.5;
+    const targetRotY = baseRotY + state.pointer.x * 0.5;
+
+    pointsRef.current.rotation.x += (targetRotX - pointsRef.current.rotation.x) * 0.1;
+    pointsRef.current.rotation.y += (targetRotY - pointsRef.current.rotation.y) * 0.1;
+
+    // Use pre-allocated _scale vector
+    const pulse = 1 + Math.sin(t * 2) * 0.02 * (1 + visitedRef.current * 0.5);
+    _scale.set(pulse, pulse, pulse);
+    pointsRef.current.scale.copy(_scale);
   });
 
   return (
@@ -57,17 +57,16 @@ export default function CatHead({ visitedCount }: CatHeadProps) {
         </bufferGeometry>
         <pointsMaterial
           size={0.03}
-          color="#e9b825ff"
+          color="#e8e8e8"
           sizeAttenuation={true}
           transparent={true}
           opacity={0.6}
         />
       </points>
-      
-      {/* Subtle inner glow / wireframe to give it structure */}
+
       <mesh>
         <icosahedronGeometry args={[3.95, 2]} />
-        <meshBasicMaterial color="#e9b825ff" wireframe transparent opacity={0.05} />
+        <meshBasicMaterial color="#e8e8e8" wireframe transparent opacity={0.05} />
       </mesh>
     </group>
   );

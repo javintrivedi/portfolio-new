@@ -12,9 +12,32 @@ body {
   color: #ffffff;
   font-family: var(--font-syne), sans-serif;
   font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Prevent mobile tap-highlight flicker */
+  -webkit-tap-highlight-color: transparent;
 }
 
 a {
   color: inherit;
   text-decoration: none;
+}
+
+/* Force GPU compositing on the canvas layer — prevents main thread paints */
+canvas {
+  display: block;
+  /* Isolate the WebGL canvas in its own compositor layer */
+  will-change: transform;
+  contain: strict;
+}
+
+/* Overlay UI — isolate from canvas compositor layer */
+#main-nav {
+  /* contain: layout prevents the nav from triggering full-page layout recalcs */
+  contain: layout style;
+}
+
+/* Prevent scroll chaining from within Lenis-scrolled containers */
+[data-lenis-prevent] {
+  overscroll-behavior: contain;
 }
